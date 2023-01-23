@@ -1,27 +1,32 @@
 import * as Popover from '@radix-ui/react-popover';
 import clsx from 'clsx';
-import * as CheckBox from '@radix-ui/react-checkbox';
 import { ProgressBar } from './progressBar';
-import { Check } from 'phosphor-react';
-import { CheckBoxComponent } from './checkBox';
 import dayjs from 'dayjs';
+import { HabitsList } from './habitsList';
+import { useState } from 'react';
 
 interface HabitDayProps {
   date: Date,
-  completed?: number,
+  defaultCompleted?: number,
   amount?: number
 }
 
-export function HabitDay({ completed = 0, amount = 0, date }: HabitDayProps) {
+export function HabitDay({ defaultCompleted = 0, amount = 0, date }: HabitDayProps) {
+  const [completed, setCompleted] = useState(defaultCompleted);
+
   const completedPorcentage = amount > 0 ? Math.round((completed / amount) * 100) : 0;
 
   const dateAndMonth = dayjs(date).format('DD/MM');
   const dayOfWeek = dayjs(date).format('dddd');
 
+  function handleCompletedChange(completed: number) {
+    setCompleted(completed);
+  }
+
   return (
     <Popover.Root>
       <Popover.Trigger
-        className={clsx('w-10 h-10 border-2 rounded-lg', {
+        className={clsx('w-10 h-10 border-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-background', {
           'bg-zinc-900 border-zinc-800': completedPorcentage == 0,
           'bg-violet-900 border-violet-700': completedPorcentage > 0 && completedPorcentage < 20,
           'bg-violet-800 border-violet-600': completedPorcentage >= 20 && completedPorcentage < 40,
@@ -38,9 +43,7 @@ export function HabitDay({ completed = 0, amount = 0, date }: HabitDayProps) {
 
           <ProgressBar progress={completedPorcentage} />
 
-          <CheckBoxComponent title='Beber 2L de água' />
-          <CheckBoxComponent title='Teste' />
-          <CheckBoxComponent title='Teste 2' />
+          <HabitsList date={date} onCompletedChanged={handleCompletedChange} />
 
           <Popover.Arrow height={8} width={16} className='fill-zinc-900' />
         </Popover.Content>
